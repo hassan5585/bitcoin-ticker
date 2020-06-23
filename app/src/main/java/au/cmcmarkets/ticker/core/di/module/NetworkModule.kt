@@ -8,6 +8,7 @@ import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
@@ -15,8 +16,7 @@ import javax.inject.Singleton
 class NetworkModule {
 
     companion object {
-        //TODO("Update this to the base URL")
-        private const val API_BASE_URL = ""
+        private const val API_BASE_URL = "https://blockchain.info/"
     }
 
     private val httpLoggingInterceptor: HttpLoggingInterceptor by lazy {
@@ -29,27 +29,28 @@ class NetworkModule {
     @Provides
     fun provideGson(): Gson {
         return GsonBuilder()
-            .setLenient()
-            .setPrettyPrinting()
-            .create()
+                .setLenient()
+                .setPrettyPrinting()
+                .create()
     }
 
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(httpLoggingInterceptor)
-            .build()
+                .addInterceptor(httpLoggingInterceptor)
+                .build()
     }
 
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(API_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .client(okHttpClient)
-            .build()
+                .baseUrl(API_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .client(okHttpClient)
+                .build()
     }
 
     @Provides
