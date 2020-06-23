@@ -2,14 +2,17 @@ package au.cmcmarkets.ticker.feature.orderticket
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
+import au.cmcmarkets.ticker.data.model.TickerCurrencyResponse
 import au.cmcmarkets.ticker.data.repository.IBitCoinRepository
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -42,7 +45,7 @@ class OrderTicketViewModel @Inject constructor(private val bitcoinRepository: IB
 
     private val internalIsPriceReadyLiveData = MutableLiveData<Boolean>()
 
-    private val internalBitCoinPriceLiveData = MutableLiveData<BigDecimal>()
+    private val internalBitCoinPriceLiveData = MutableLiveData<TickerCurrencyResponse>()
 
     val amountLiveData: LiveData<String> = Transformations.map(internalUnitsLiveData) { newUnitsValueString ->
         if (newUnitsValueString.isBlank()) {
@@ -50,7 +53,7 @@ class OrderTicketViewModel @Inject constructor(private val bitcoinRepository: IB
         } else {
             internalBitCoinPriceLiveData.value?.let { oldBitCoinValue ->
                 val newUnitsValue = BigDecimal(newUnitsValueString)
-                val newAmountValue = oldBitCoinValue.multiply(newUnitsValue)
+                val newAmountValue = oldBitCoinValue.buyPrice.multiply(newUnitsValue)
                 getFormattedAmountValue(newAmountValue)
             } ?: EMPTY_STRING
         }
@@ -62,10 +65,14 @@ class OrderTicketViewModel @Inject constructor(private val bitcoinRepository: IB
         } else {
             internalBitCoinPriceLiveData.value?.let { oldBitCoinValue ->
                 val newAmountValue = BigDecimal(newAmountValueString)
-                val newUnitsValue = newAmountValue.divide(oldBitCoinValue, 2, RoundingMode.HALF_UP)
+                val newUnitsValue = newAmountValue.divide(oldBitCoinValue.buyPrice, 2, RoundingMode.HALF_UP)
                 getFormattedUnitsValue(newUnitsValue)
             } ?: EMPTY_STRING
         }
+    }
+
+    val orderDetailsLiveData: LiveData<OrderTicketDetails> = Transformations.map(internalBitCoinPriceLiveData) {
+        OrderTicketDetails(decimalFormat.format(it.buyPrice), decimalFormat.format(it.sellPrice), decimalFormat.format(it.buyPrice.subtract(it.sellPrice)))
     }
 
     val isPriceReadyLiveData: LiveData<Boolean>
@@ -77,13 +84,16 @@ class OrderTicketViewModel @Inject constructor(private val bitcoinRepository: IB
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onResume() {
-        addDisposable(tickerObservable.subscribe {
-            it.getGBPValue()?.buyPrice?.let {
-                internalBitCoinPriceLiveData.postValue(it)
-                internalIsPriceReadyLiveData.postValue(true)
-            } ?: internalIsPriceReadyLiveData.postValue(false)
+    fun onResume(): CountDownLatch {
+        val priceCountDownLatch = CountDownLatch(1)
+        addDisposable(tickerObservable.observeOn(AndroidSchedulers.mainThread()).subscribe {
+            it.getGBPValue()?.let {
+                internalBitCoinPriceLiveData.value = it
+                internalIsPriceReadyLiveData.value = true
+            }
+            priceCountDownLatch.countDown()
         })
+        return priceCountDownLatch
     }
 
     fun setUnits(units: String) {
@@ -96,6 +106,10 @@ class OrderTicketViewModel @Inject constructor(private val bitcoinRepository: IB
         if (internalIsPriceReadyLiveData.value == true && amount != internalAmountLiveData.value) {
             internalAmountLiveData.value = amount
         }
+    }
+
+    fun onConfirmClicked() {
+        // Do Something
     }
 
     private fun addDisposable(disposable: Disposable) {

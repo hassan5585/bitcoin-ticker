@@ -5,18 +5,15 @@ import androidx.lifecycle.Observer
 import au.cmcmarkets.ticker.data.model.TickerCurrencyResponse
 import au.cmcmarkets.ticker.data.model.TickerResponse
 import au.cmcmarkets.ticker.data.repository.IBitCoinRepository
+import au.cmcmarkets.ticker.rule.RxRule
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.*
-import org.mockito.MockitoAnnotations
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -31,21 +28,21 @@ class OrderTicketViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val rxRule = RxRule()
+
+    private lateinit var viewModel: OrderTicketViewModel
+
     private val bitcoinRepository: IBitCoinRepository = mock(IBitCoinRepository::class.java)
 
     private val decimalFormat: NumberFormat by lazy {
         DecimalFormat("###.##")
     }
 
-    private lateinit var viewModel: OrderTicketViewModel
-
     private val emptyTickerResponse: TickerResponse = TickerResponse()
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
-        RxJavaPlugins.reset()
-        RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
         viewModel = OrderTicketViewModel(bitcoinRepository)
     }
 
@@ -69,7 +66,7 @@ class OrderTicketViewModelTest {
     fun `given no price set bitcoin changing the amount value should do nothing`() {
         val observable = Observable.just(emptyTickerResponse)
         `when`(bitcoinRepository.getTickerPrices()).thenReturn(observable)
-        viewModel.onResume()
+        viewModel.onResume().await()
         viewModel.setAmount("10")
         assertThat(viewModel.unitsLiveData.value, `is`(nullValue()))
     }
@@ -78,7 +75,7 @@ class OrderTicketViewModelTest {
     fun `given no price set bitcoin changing the units value should do nothing`() {
         val observable = Observable.just(emptyTickerResponse)
         `when`(bitcoinRepository.getTickerPrices()).thenReturn(observable)
-        viewModel.onResume()
+        viewModel.onResume().await()
         viewModel.setUnits("10")
         assertThat(viewModel.amountLiveData.value, `is`(nullValue()))
     }
@@ -88,8 +85,7 @@ class OrderTicketViewModelTest {
         val tickerResponse = getTickerWithCorrectCurrency()
         val observable = Observable.just(tickerResponse)
         `when`(bitcoinRepository.getTickerPrices()).thenReturn(observable)
-        viewModel.onResume()
-        Thread.sleep(1000)
+        viewModel.onResume().await()
         assertThat(viewModel.isPriceReadyLiveData.value, `is`(true))
     }
 
@@ -113,8 +109,7 @@ class OrderTicketViewModelTest {
         val tickerResponse = getTickerWithCorrectCurrency()
         val observable = Observable.just(tickerResponse)
         `when`(bitcoinRepository.getTickerPrices()).thenReturn(observable)
-        viewModel.onResume()
-        Thread.sleep(1000)
+        viewModel.onResume().await()
         viewModel.setUnits("10")
         assertThat(viewModel.amountLiveData.value, `is`(notNullValue()))
         assertThat(viewModel.amountLiveData.value, `is`(decimalFormat.format(BigDecimal(100.00))))
@@ -128,8 +123,7 @@ class OrderTicketViewModelTest {
         val tickerResponse = getTickerWithCorrectCurrency()
         val observable = Observable.just(tickerResponse)
         `when`(bitcoinRepository.getTickerPrices()).thenReturn(observable)
-        viewModel.onResume()
-        Thread.sleep(1000)
+        viewModel.onResume().await()
         viewModel.setAmount("10")
         assertThat(viewModel.unitsLiveData.value, `is`(notNullValue()))
         assertThat(viewModel.unitsLiveData.value, `is`(decimalFormat.format(BigDecimal(1))))

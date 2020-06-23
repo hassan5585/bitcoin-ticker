@@ -7,6 +7,23 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:editTextStyle">@style/CMCEditTextStyle</item>
+        <item name="editTextStyle">@style/CMCEditTextStyle</item>
+        <item name="buttonStyle">@style/CMCButtonStyle</item>
+        <item name="android:buttonStyle">@style/CMCButtonStyle</item>
     </style>
 
+
+    <style name="CMCEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/background_edit_text</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textCursorDrawable">@null</item>
+    </style>
+
+    <style name="CMCButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/background_button</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 </resources>

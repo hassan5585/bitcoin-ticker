@@ -69,15 +69,33 @@ class OrderTicketFragment : DaggerFragment() {
             unitsEditText.removeTextChangedListener(unitsTextWatcher)
             unitsEditText.setText(it)
             unitsEditText.addTextChangedListener(unitsTextWatcher)
+            configureButton()
         })
         viewModel.amountLiveData.observe(viewLifecycleOwner, Observer {
             // Distinguish between text added by user and text coming from VM we remove the textwatcher temporarily
             amountEditText.removeTextChangedListener(amountTextWatcher)
             amountEditText.setText(it)
             amountEditText.addTextChangedListener(amountTextWatcher)
+            configureButton()
+        })
+        viewModel.orderDetailsLiveData.observe(viewLifecycleOwner, Observer {
+            sellTextView.text = it.sellPrice
+            buyTextView.text = it.buyPrice
+            spreadTextView.text = it.spreadPrice
         })
         amountEditText.addTextChangedListener(amountTextWatcher)
         unitsEditText.addTextChangedListener(unitsTextWatcher)
+        confirmButton.setOnClickListener {
+            if (it.isEnabled) {
+                viewModel.onConfirmClicked()
+            }
+        }
+        configureButton()
     }
 
+    private fun configureButton() {
+        val isButtonActive = unitsEditText.text?.isNotBlank() == true && amountEditText.text?.isNotBlank() == true
+        confirmButton.isActivated = isButtonActive
+        confirmButton.isEnabled = isButtonActive
+    }
 }

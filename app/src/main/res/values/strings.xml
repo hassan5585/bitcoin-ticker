@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Bitcoin ticker</string>
-
+    <string name="text_buy">BUY</string>
+    <string name="text_sell">SELL</string>
+    <string name="text_units">Units</string>
+    <string name="text_amount">Amount (\u00a3)</string>
+    <string name="text_confirm">Confirm</string>
 </resources>

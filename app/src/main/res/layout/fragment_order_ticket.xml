@@ -3,27 +3,129 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/black">
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/amountEditText"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:hint="Numbers"
-        android:inputType="numberDecimal"
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sellTextView"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:background="@color/black"
+        android:gravity="center"
+        android:textColor="@color/green"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toStartOf="@id/buyTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="50.00" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sellTitleTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/default_horizontal_margin"
+        android:gravity="start"
+        android:text="@string/text_sell"
+        android:textColor="@color/green"
+        app:layout_constraintEnd_toEndOf="@id/sellTextView"
+        app:layout_constraintStart_toStartOf="@id/sellTextView"
+        app:layout_constraintTop_toTopOf="@id/sellTextView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/buyTextView"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:background="@color/blue_dark"
+        android:gravity="center"
+        android:textColor="@color/green"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sellTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="50.00" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/buyTitleTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/default_horizontal_margin"
+        android:gravity="end"
+        android:text="@string/text_buy"
+        android:textColor="@color/green"
+        app:layout_constraintEnd_toEndOf="@id/buyTextView"
+        app:layout_constraintStart_toStartOf="@id/buyTextView"
+        app:layout_constraintTop_toTopOf="@id/buyTextView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/spreadTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/buyTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:text="1.00" />
 
-    <androidx.appcompat.widget.AppCompatEditText
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/unitsTitleTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_vertical_margin"
+        android:gravity="center"
+        android:text="@string/text_units"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@id/amountTitleTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buyTextView" />
+
+    <au.cmcmarkets.ticker.view.CMCEditText
         android:id="@+id/unitsEditText"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="50dp"
+        android:layout_marginStart="@dimen/default_horizontal_margin"
+        android:layout_marginEnd="@dimen/default_horizontal_margin"
+        android:digits="0123456789."
         android:inputType="numberDecimal"
-        android:layout_marginTop="50dp"
-        android:hint="Units"
+        app:layout_constraintEnd_toEndOf="@id/unitsTitleTextView"
+        app:layout_constraintStart_toStartOf="@id/unitsTitleTextView"
+        app:layout_constraintTop_toBottomOf="@id/unitsTitleTextView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/amountTitleTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_vertical_margin"
+        android:gravity="center"
+        android:text="@string/text_amount"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amountEditText" />
+        app:layout_constraintStart_toEndOf="@id/unitsTitleTextView"
+        app:layout_constraintTop_toBottomOf="@id/buyTextView" />
+
+    <au.cmcmarkets.ticker.view.CMCEditText
+        android:id="@+id/amountEditText"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="@dimen/default_horizontal_margin"
+        android:layout_marginEnd="@dimen/default_horizontal_margin"
+        android:digits="0123456789."
+        android:inputType="numberDecimal"
+        app:layout_constraintEnd_toEndOf="@id/amountTitleTextView"
+        app:layout_constraintStart_toStartOf="@id/amountTitleTextView"
+        app:layout_constraintTop_toBottomOf="@id/amountTitleTextView" />
+
+    <au.cmcmarkets.ticker.view.CMCButton
+        android:id="@+id/confirmButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/default_horizontal_margin"
+        android:layout_marginEnd="@dimen/default_horizontal_margin"
+        android:layout_marginBottom="@dimen/default_vertical_margin"
+        android:text="@string/text_confirm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
