@@ -52,9 +52,13 @@ class OrderTicketViewModel @Inject constructor(private val bitcoinRepository: IB
             EMPTY_STRING
         } else {
             internalBitCoinPriceLiveData.value?.let { oldBitCoinValue ->
-                val newUnitsValue = BigDecimal(newUnitsValueString)
-                val newAmountValue = oldBitCoinValue.buyPrice.multiply(newUnitsValue)
-                getFormattedAmountValue(newAmountValue)
+                try {
+                    val newUnitsValue = BigDecimal(newUnitsValueString)
+                    val newAmountValue = oldBitCoinValue.buyPrice.multiply(newUnitsValue)
+                    getFormattedAmountValue(newAmountValue)
+                } catch (exception: NumberFormatException) {
+                    EMPTY_STRING
+                }
             } ?: EMPTY_STRING
         }
     }
@@ -64,9 +68,13 @@ class OrderTicketViewModel @Inject constructor(private val bitcoinRepository: IB
             EMPTY_STRING
         } else {
             internalBitCoinPriceLiveData.value?.let { oldBitCoinValue ->
-                val newAmountValue = BigDecimal(newAmountValueString)
-                val newUnitsValue = newAmountValue.divide(oldBitCoinValue.buyPrice, 2, RoundingMode.HALF_UP)
-                getFormattedUnitsValue(newUnitsValue)
+                try {
+                    val newAmountValue = BigDecimal(newAmountValueString)
+                    val newUnitsValue = newAmountValue.divide(oldBitCoinValue.buyPrice, 2, RoundingMode.HALF_UP)
+                    getFormattedUnitsValue(newUnitsValue)
+                } catch (exception: NumberFormatException) {
+                    EMPTY_STRING
+                }
             } ?: EMPTY_STRING
         }
     }

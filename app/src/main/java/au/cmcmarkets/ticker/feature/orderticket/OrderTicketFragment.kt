@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import au.cmcmarkets.ticker.R
 import au.cmcmarkets.ticker.core.di.viewmodel.ViewModelFactory
 import au.cmcmarkets.ticker.utils.SimpleTextChangeListener
+import au.cmcmarkets.ticker.utils.isGreaterThanZero
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_order_ticket.*
 import javax.inject.Inject
@@ -94,7 +95,7 @@ class OrderTicketFragment : DaggerFragment() {
     }
 
     private fun configureButton() {
-        val isButtonActive = unitsEditText.text?.isNotBlank() == true && amountEditText.text?.isNotBlank() == true
+        val isButtonActive = unitsEditText.text?.isNotBlank() == true && amountEditText.text?.isNotBlank() == true && (unitsEditText.text?.toString()?.toDoubleOrNull()?.isGreaterThanZero() == true)
         confirmButton.isActivated = isButtonActive
         confirmButton.isEnabled = isButtonActive
     }
