@@ -47,22 +47,38 @@ class OrderTicketViewModel @Inject constructor(private val bitcoinRepository: IB
 
     private val internalBitCoinPriceLiveData = MutableLiveData<TickerCurrencyResponse>()
 
-    val amountLiveData: LiveData<String> = Transformations.map(internalUnitsLiveData) { newUnitsValueString ->
-        if (newUnitsValueString.isBlank()) {
-            EMPTY_STRING
-        } else {
-            internalBitCoinPriceLiveData.value?.let { oldBitCoinValue ->
-                try {
-                    val newUnitsValue = BigDecimal(newUnitsValueString)
-                    val newAmountValue = oldBitCoinValue.buyPrice.multiply(newUnitsValue)
-                    getFormattedAmountValue(newAmountValue)
-                } catch (exception: NumberFormatException) {
-                    EMPTY_STRING
-                }
-            } ?: EMPTY_STRING
+    val amountLiveData: LiveData<String> = MediatorLiveData<String>().apply {
+        addSource(internalUnitsLiveData) { newUnitsValueString ->
+            value = if (newUnitsValueString.isBlank()) {
+                EMPTY_STRING
+            } else {
+                internalBitCoinPriceLiveData.value?.let { oldBitCoinValue ->
+                    try {
+                        val newUnitsValue = BigDecimal(newUnitsValueString)
+                        val newAmountValue = oldBitCoinValue.buyPrice.multiply(newUnitsValue)
+                        getFormattedAmountValue(newAmountValue)
+                    } catch (exception: NumberFormatException) {
+                        EMPTY_STRING
+                    }
+                } ?: EMPTY_STRING
+            }
+        }
+
+        addSource(internalBitCoinPriceLiveData) { newBitCoinPrice ->
+            internalUnitsLiveData.value?.let { oldUnitsValueString ->
+                value = if (oldUnitsValueString.isNotBlank()) {
+                    try {
+                        val oldUnitsValue = BigDecimal(oldUnitsValueString)
+                        val newAmountValue = newBitCoinPrice.buyPrice.multiply(oldUnitsValue)
+                        getFormattedAmountValue(newAmountValue)
+                    } catch (exception: NumberFormatException) {
+                        EMPTY_STRING
+                    }
+                } else EMPTY_STRING
+            }
         }
     }
-
+    
     val unitsLiveData: LiveData<String> = Transformations.map(internalAmountLiveData) { newAmountValueString ->
         if (newAmountValueString.isBlank()) {
             EMPTY_STRING
